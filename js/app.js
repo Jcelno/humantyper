@@ -68,7 +68,21 @@
   const list = $("#profileList");
   let confirmDelete = null;
 
+  function renderGdocProfile() {
+    const sel = $("#gdocProfile");
+    if (!sel) return;
+    sel.innerHTML = "";
+    for (const p of S.profiles) {
+      const o = document.createElement("option");
+      o.value = p.id; o.textContent = p.name; o.selected = p.id === S.activeId;
+      sel.appendChild(o);
+    }
+    const p = active(), c = p.cal || {};
+    $("#gdocProfileInfo").textContent = `${Math.round(p.params.wpm)} wpm · ${p.params.mistakeRate.toFixed(1)}% mistakes · `
+      + (c.summary ? `calibrated from ${c.summary.keystrokes.toLocaleString()} of your keystrokes` : "not calibrated");
+  }
   function renderProfiles() {
+    renderGdocProfile();
     list.innerHTML = "";
     for (const p of S.profiles) {
       const li = document.createElement("li");
@@ -162,6 +176,7 @@
         input.addEventListener("input", () => {
           p.params[key] = +input.value; sync(); save();
           if (key === "wpm") { list.querySelector(".profile.active .tag").textContent = `${Math.round(p.params.wpm)} wpm`; updateText(); }
+          renderGdocProfile();
           resetRun();
         });
         box.appendChild(row);
@@ -363,7 +378,7 @@
     $("#gdocStart").disabled = activeJob || !helperOk;
     $("#gdocStatus").textContent =
       r.state === "countdown" ? r.message
-      : r.state === "typing" ? `Typing in Google Docs… ${Math.round((100 * r.done) / Math.max(r.total, 1))}%`
+      : r.state === "typing" ? `Typing in Google Docs as ${r.profile || active().name}… ${Math.round((100 * r.done) / Math.max(r.total, 1))}%`
       : r.state === "done" ? "Done ✓"
       : r.state === "stopped" ? "Stopped."
       : r.state === "error" ? `Couldn't type: ${r.message}` : "";
@@ -376,12 +391,16 @@
     const meta = MD.parse(text.value, S.format);
     const { events } = HT.plan(meta, active().params, (Math.random() * 2 ** 31) | 0);
     const actions = DOCS.toActions(meta, events, DOCS.isMac(), formatted);
-    const r = await DOCS.send({ cmd: "start", actions, countdown: 3 });
+    const r = await DOCS.send({ cmd: "start", actions, countdown: 3, profile: active().name });
     if (!r) { checkHelper(); return; }
     if (!r.ok) { $("#gdocStatus").textContent = r.error; return; }
     clearInterval(gdocTimer);
     gdocTimer = setInterval(pollDocs, 300);
     pollDocs();
+  });
+  $("#gdocProfile").addEventListener("change", (e) => {
+    confirmDelete = null;
+    S.activeId = e.target.value; save(); onProfileChange();
   });
   $("#gdocStop").addEventListener("click", () => DOCS.send({ cmd: "stop" }).then(pollDocs));
   checkHelper();

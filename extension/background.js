@@ -53,7 +53,8 @@ async function findTarget(target) {
 async function run(msg) {
   const tab = await findTarget(msg.target);
   if (!tab) throw new Error("No Google Doc is open. Open your document in another tab first.");
-  const j = (job = { tabId: tab.id, actions: msg.actions, i: 0, state: "countdown", message: "", stop: false });
+  const j = (job = { tabId: tab.id, actions: msg.actions, i: 0, state: "countdown", message: "", stop: false,
+    profile: typeof msg.profile === "string" ? msg.profile.slice(0, 60) : "" });
   await chrome.debugger.attach({ tabId: tab.id }, "1.3");
   const keepAlive = setInterval(() => chrome.runtime.getPlatformInfo(), 20000);
   try {
@@ -80,7 +81,7 @@ async function run(msg) {
 
 function status() {
   if (!job) return { state: "idle" };
-  return { state: job.state, done: job.i, total: job.actions.length, message: job.message };
+  return { state: job.state, done: job.i, total: job.actions.length, message: job.message, profile: job.profile };
 }
 
 function handle(msg, sendResponse) {

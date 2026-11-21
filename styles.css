@@ -212,6 +212,13 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border: 0; bo
 .gdoc { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; margin-top: 2px; border-top: 1px solid var(--line); }
 .gdoc h3 { margin: 0; font-size: 13px; font-weight: 600; }
 .gdoc .hint b { color: var(--text); font-weight: 500; }
+.typing-as { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.typing-as select {
+  flex: 1; font: inherit; color: var(--text); background: rgba(255,255,255,0.05); border: 1px solid var(--line-2);
+  border-radius: 10px; padding: 7px 10px; outline: 0; cursor: pointer;
+}
+.typing-as select:focus { border-color: rgba(165,180,255,0.5); }
+.typing-as option { background: #14141c; }
 .pill { font-size: 11px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--muted); }
 .pill.ok { color: var(--good); border-color: rgba(126,224,181,0.35); }
 .pill.off { color: var(--bad); border-color: rgba(255,138,154,0.35); }
