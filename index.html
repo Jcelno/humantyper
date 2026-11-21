@@ -102,6 +102,19 @@
           <div><b id="runFix">0</b><span>fixes</span></div>
         </div>
         <div class="progress"><span id="runBar"></span></div>
+
+        <div class="gdoc">
+          <div class="row between">
+            <h3>Type into Google Docs</h3>
+            <span class="pill" id="gdocHelper">checking…</span>
+          </div>
+          <p class="hint" id="gdocHint">Open your Google Doc in another tab and click where the text should go. Then press the button: it switches to your doc and starts typing after 3 seconds. Press <b>Esc</b> in the doc, or Stop here, to stop.</p>
+          <div class="row">
+            <button class="primary" id="gdocStart">Type into Google Doc</button>
+            <button class="ghost" id="gdocStop" hidden>Stop</button>
+          </div>
+          <p class="muted" id="gdocStatus"></p>
+        </div>
       </div>
     </aside>
   </main>
@@ -109,6 +122,7 @@
   <script src="js/engine.js"></script>
   <script src="js/markdown.js"></script>
   <script src="js/calibration.js"></script>
+  <script src="js/docs.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -339,6 +339,54 @@
     speed = +b.dataset.speed; setSeg($("#runSpeed"), "speed", b.dataset.speed);
   });
 
+  // ------------------------------------------------------------------ google docs (via helper extension)
+  let gdocTimer = 0, helperOk = false;
+  const SETUP = "https://github.com/Jcelno/humantyper#type-into-google-docs";
+  async function checkHelper() {
+    const r = await DOCS.send({ cmd: "ping" });
+    helperOk = !!(r && r.ok);
+    const pill = $("#gdocHelper");
+    pill.textContent = helperOk ? "helper connected" : "helper not installed";
+    pill.className = "pill " + (helperOk ? "ok" : "off");
+    $("#gdocStart").disabled = !helperOk;
+    if (!helperOk) {
+      $("#gdocStatus").innerHTML = location.protocol === "file:"
+        ? `Open this site from its web address (not the local file) and install the <a href="${SETUP}" target="_blank" rel="noopener">helper extension</a>.`
+        : `Install the free <a href="${SETUP}" target="_blank" rel="noopener">helper extension</a> in Chrome (one minute), then reload this page.`;
+    } else if (!gdocTimer) $("#gdocStatus").textContent = "";
+  }
+  async function pollDocs() {
+    const r = await DOCS.send({ cmd: "status" });
+    if (!r) return;
+    const activeJob = r.state === "typing" || r.state === "countdown";
+    $("#gdocStop").hidden = !activeJob;
+    $("#gdocStart").disabled = activeJob || !helperOk;
+    $("#gdocStatus").textContent =
+      r.state === "countdown" ? r.message
+      : r.state === "typing" ? `Typing in Google Docs… ${Math.round((100 * r.done) / Math.max(r.total, 1))}%`
+      : r.state === "done" ? "Done ✓"
+      : r.state === "stopped" ? "Stopped."
+      : r.state === "error" ? `Couldn't type: ${r.message}` : "";
+    if (!activeJob) { clearInterval(gdocTimer); gdocTimer = 0; }
+  }
+  $("#gdocStart").addEventListener("click", async () => {
+    if (!text.value.trim()) { $("#gdocStatus").textContent = "Paste some text on the left first."; return; }
+    pauseRun();
+    const formatted = S.format === "markdown";
+    const meta = MD.parse(text.value, S.format);
+    const { events } = HT.plan(meta, active().params, (Math.random() * 2 ** 31) | 0);
+    const actions = DOCS.toActions(meta, events, DOCS.isMac(), formatted);
+    const r = await DOCS.send({ cmd: "start", actions, countdown: 3 });
+    if (!r) { checkHelper(); return; }
+    if (!r.ok) { $("#gdocStatus").textContent = r.error; return; }
+    clearInterval(gdocTimer);
+    gdocTimer = setInterval(pollDocs, 300);
+    pollDocs();
+  });
+  $("#gdocStop").addEventListener("click", () => DOCS.send({ cmd: "stop" }).then(pollDocs));
+  checkHelper();
+  window.addEventListener("focus", () => { if (!gdocTimer) checkHelper(); });
+
   // ------------------------------------------------------------------ init
   function onProfileChange() {
     renderProfiles(); renderTune(); renderCalData(); updateText(); resetRun();

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "humantyper helper",
+  "version": "1.0.0",
+  "description": "Lets the humantyper website type your text into a Google Doc.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyS6/faMCp0zp47SqfprP0OtTPUd5qWGcsh6u0D3UTgSTneldk+z5oqR4UuIMOKv47IrH92NZNO1uBCg2pu9w5l4a2qdxFtlYsZzWW8EyHFzZBjWLPJRwM+ydkI/HVr+y76ZjxmA6lF1bIJz8R1g4eahmxNszqbDz7EJSdxzT3Q/H3MItu96fkjU+5dmIu/1GiNy9cwF94VPyqN4NunDPv2VGF7dDeIgrsE1DVLnwRtUK+01g0mwQNMIDWMirSHLqDcFzipNO3/TQznjosJRcsuS5xUwKRoyj5rHfvWAgn+TrExfrjRFWRvqSQwpDid8BfIBF1/6NYxGYHlxZiEel3wIDAQAB",
+  "permissions": [
+    "debugger",
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "humantyper",
+    "default_popup": "popup.html"
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://jcelno.github.io/*",
+      "http://localhost/*",
+      "http://127.0.0.1/*"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://docs.google.com/document/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "all_frames": true,
+      "match_about_blank": true,
+      "run_at": "document_idle"
+    }
+  ]
+}
