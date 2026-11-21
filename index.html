@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>humantyper</title>
+  <meta name="description" content="Paste text, tune a typing profile, calibrate it to your own rhythm and preview it typing.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2311111a'/%3E%3Crect x='14' y='8' width='4' height='16' rx='2' fill='%23a5b4ff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="brand"><span class="caret"></span>humantyper</div>
+  </header>
+
+  <main class="layout">
+    <!-- ============================================================ text -->
+    <section class="pane text-pane" aria-label="Text">
+      <div class="pane-head">
+        <div class="seg" role="tablist" id="viewTabs">
+          <button class="on" data-view="write" role="tab">Write</button>
+          <button data-view="preview" role="tab">Preview</button>
+        </div>
+        <div class="seg small" id="formatTabs" title="How the text is read">
+          <button data-format="plain">Plain</button>
+          <button data-format="markdown">Markdown</button>
+        </div>
+      </div>
+      <div class="pane-body">
+        <textarea id="text" spellcheck="false" placeholder="Paste or write anything here…"></textarea>
+        <div id="preview" class="doc" hidden></div>
+      </div>
+      <div class="pane-foot">
+        <span id="counts">0 characters · 0 words</span>
+        <span id="estimate"></span>
+      </div>
+    </section>
+
+    <!-- ============================================================ profiles -->
+    <aside class="pane profile-pane" aria-label="Typing profiles">
+      <div class="pane-head">
+        <h2>Profiles</h2>
+        <button class="ghost" id="newProfile" title="New profile">+ New</button>
+      </div>
+      <ul class="profiles" id="profileList"></ul>
+
+      <div class="seg tabs" role="tablist" id="profileTabs">
+        <button class="on" data-tab="tune" role="tab">Tune</button>
+        <button data-tab="calibrate" role="tab">Calibrate</button>
+        <button data-tab="run" role="tab">Run</button>
+      </div>
+
+      <!-- tune -->
+      <div class="tab" id="tab-tune"></div>
+
+      <!-- calibrate -->
+      <div class="tab" id="tab-calibrate" hidden>
+        <p class="hint">Type the prompt at your natural pace and fix mistakes the way you normally would. Your rhythm is measured only in this box and stays in your browser.</p>
+        <div class="chips" id="promptChips"></div>
+        <div class="prompt" id="promptView"></div>
+        <textarea id="calInput" class="cal-input" spellcheck="false" autocomplete="off" placeholder="Start typing the prompt…"></textarea>
+        <div class="row between">
+          <span class="muted" id="calLive">Timing starts with your first key.</span>
+          <button class="ghost" id="calRestart">Restart</button>
+        </div>
+        <div class="cal-data">
+          <div class="meter"><span id="calMeter"></span></div>
+          <div class="row between">
+            <span class="muted" id="calStats">No sessions yet</span>
+            <button class="ghost danger" id="calClear">Clear</button>
+          </div>
+          <button class="primary" id="calApply" disabled>Update profile from calibration</button>
+          <p class="muted small" id="calResult"></p>
+        </div>
+      </div>
+
+      <!-- run -->
+      <div class="tab" id="tab-run" hidden>
+        <div class="mock">
+          <div class="mock-bar"><i></i><i></i><i></i><span>Untitled document</span></div>
+          <div class="mock-doc doc" id="mockDoc"></div>
+        </div>
+        <div class="row between">
+          <div class="row">
+            <button class="primary icon" id="runPlay" title="Play">Play</button>
+            <button class="ghost" id="runRestart">Restart</button>
+          </div>
+          <div class="seg small" id="runSpeed">
+            <button class="on" data-speed="1">1×</button>
+            <button data-speed="2">2×</button>
+            <button data-speed="4">4×</button>
+          </div>
+        </div>
+        <div class="stats">
+          <div><b id="runWpm">–</b><span>wpm</span></div>
+          <div><b id="runPct">0%</b><span>progress</span></div>
+          <div><b id="runFix">0</b><span>fixes</span></div>
+        </div>
+        <div class="progress"><span id="runBar"></span></div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="js/engine.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/calibration.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
